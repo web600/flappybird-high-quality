@@ -1,2 +1,3 @@
-# flappybird-high-quality
-New game and new high quality game 
+# playwright-core
+
+This package contains the no-browser flavor of [Playwright](http://github.com/microsoft/playwright).

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#faf8ef">
+  <title>Flappy Bird — 小小翅膀，大大冒險</title>
+  <style>
+    :root{--ink:#253e35;--paper:#faf8ef;--muted:#79877a;--yellow:#ffd250;--green:#4e795c;--line:#e3e6d8}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:"Segoe UI","Microsoft JhengHei",sans-serif;font-size:14px}button{font:inherit;color:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #c27d1c;outline-offset:5px}button:disabled{cursor:default}button,canvas{-webkit-tap-highlight-color:transparent}button{touch-action:manipulation}svg{display:block}button svg{pointer-events:none}.hidden{display:none!important}
+    header{max-width:1140px;margin:auto;height:86px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:0 12px}.brand{display:flex;align-items:center;gap:11px;font-size:19px;font-weight:900;letter-spacing:1.3px}.brand-icon{width:38px;height:38px;background:#ffdf7a;border:1px solid #e2bf65;display:grid;place-items:center;border-radius:11px}.brand span span{font-weight:400;color:#779078}.header-right{display:flex;align-items:center;gap:26px}.text-button{background:none;border:0;font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;padding:8px 0}.record-pill{display:flex;align-items:center;gap:8px;font-size:12px;background:#f0f0e5;border:1px solid #e3e4d5;border-radius:30px;padding:9px 15px}.record-pill strong{font-size:14px;margin-left:4px;font-family:monospace}.record-pill svg{color:#a98638}
+    main{max-width:1040px;margin:0 auto;padding:0 20px}.hero{text-align:center;padding:34px 0 26px;position:relative}.eyebrow{font-size:11px;letter-spacing:3px;font-weight:700;color:#72886f;display:flex;align-items:center;justify-content:center;gap:9px}.eyebrow::before{content:"";width:6px;height:6px;background:#82a26b;border-radius:50%}.title-row{display:flex;align-items:center;justify-content:center;gap:23px;margin:9px 0 12px}.title-row h1{font-family:"Arial Black","Segoe UI",sans-serif;line-height:1;letter-spacing:-3.5px;font-size:66px;margin:0;color:#ffcf52;font-weight:1000;-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;text-shadow:0 5px 0 var(--ink);transform:rotate(-2deg)}.title-row h1 span{color:#83b8a0}.hero-bird{transform:rotate(-9deg);filter:drop-shadow(0 4px 0 #213b3320);animation:bob 2.3s ease-in-out infinite}.hero p{color:#788176;letter-spacing:1.5px;font-size:13px;margin:0}.little-star{position:absolute;font-size:25px;color:#d0af5d;top:70px;left:13%;transform:rotate(12deg)}.little-star.right{left:auto;right:14%;top:105px;color:#9ab49a;font-size:17px}
+    .game-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.game-label{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:1.4px;color:#85927d;font-weight:700}.live-dot{width:7px;height:7px;border-radius:50%;background:#6d9868;box-shadow:0 0 0 3px #6d986812}.mode-switch{display:flex;padding:4px;gap:3px;border:1px solid var(--line);border-radius:9px;background:#f0f0e7}.mode-button{border:0;background:none;border-radius:5px;padding:5px 15px;color:#8b9286;font-size:12px;font-weight:600;transition:background .15s}.mode-button.active{background:#fffef7;color:#385342;box-shadow:0 1px 3px #20302012}.mode-button:disabled{opacity:.5}
+    .game-frame{position:relative;border:3px solid #345845;border-radius:17px;background:#b7dfda;overflow:hidden;box-shadow:0 7px 0 #e1e3d3;isolation:isolate;aspect-ratio:2.15/1}.game-frame canvas{display:block;width:100%;height:100%;touch-action:none;outline:none}.hud{position:absolute;inset:0;pointer-events:none;z-index:2}.world-label{position:absolute;left:23px;top:24px;display:flex;gap:9px;align-items:center;color:#3d7769;font-size:10px;font-weight:800;letter-spacing:2px}.world-label svg{color:#508678}.score-hud{position:absolute;top:23px;left:50%;transform:translateX(-50%);text-align:center}.score-caption{color:#49796a;font-size:9px;letter-spacing:3px;font-weight:700}.live-score{font-size:45px;font-family:"Arial Black",monospace;font-weight:900;line-height:1.15;color:white;-webkit-text-stroke:1px #385e4a;paint-order:stroke fill;text-shadow:0 3px 0 #426f534a}.coin-hud{font-family:monospace;color:#466c4f;font-size:13px;display:flex;align-items:center;justify-content:center;gap:5px}.coin-icon{height:12px;width:12px;background:#ffd250;border:2px solid #b38235;box-shadow:inset 2px 0 #ffeb9c;display:inline-block;border-radius:50%}.canvas-actions{position:absolute;right:17px;top:18px;display:flex;gap:7px;pointer-events:auto}.icon-button{width:34px;height:34px;border:1px solid #4d7d6140;border-radius:8px;background:#ffffec65;display:grid;place-items:center;transition:background .15s}.icon-button:hover{background:#ffffecbb}.icon-button svg{width:15px;height:15px}.icon-button:disabled{opacity:.35}.combo-toast{position:absolute;left:50%;top:30%;transform:translateX(-50%);font-weight:900;font-size:16px;color:#89631e;opacity:0;transition:opacity .15s;white-space:nowrap;background:#fff8d8d9;border:1px solid #e2bf6c;border-radius:20px;padding:7px 15px}.combo-toast.show{opacity:1}
+    .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;padding:62px 20px 35px;pointer-events:none}.overlay-panel{text-align:center;pointer-events:auto;max-width:430px}.start-mascot{width:76px;height:62px;margin:0 auto 4px;animation:bob 1.6s ease-in-out infinite;filter:drop-shadow(0 6px 0 #376b5719)}.overlay h2{font-size:27px;font-weight:850;letter-spacing:1px;margin:9px 0;color:#2d5947;text-shadow:0 1px #e8fff280}.overlay p{font-size:12px;color:#577969;margin:8px 0 18px;letter-spacing:1px}.primary-button{display:inline-flex;justify-content:center;align-items:center;gap:17px;background:#ffd152;border:2px solid #324d35;box-shadow:0 4px 0 #324d35;border-radius:9px;padding:12px 28px;font-size:16px;font-weight:800;letter-spacing:1px;transition:transform .12s,box-shadow .12s}.primary-button:hover{background:#ffdc76;transform:translateY(-1px);box-shadow:0 5px 0 #324d35}.primary-button:active{transform:translateY(3px);box-shadow:0 1px 0 #324d35}.primary-button svg{width:16px;height:16px}.keyboard-hint{display:flex;justify-content:center;align-items:center;gap:7px;margin-top:18px;font-size:10px;color:#567565;letter-spacing:.5px}kbd{font:10px "Segoe UI",sans-serif;display:inline-flex;align-items:center;justify-content:center;padding:3px 8px;border:1px solid #748b714f;background:#ffffe98a;border-radius:4px;box-shadow:0 2px 0 #52734a17;min-width:22px}.ready-hint{position:absolute;bottom:57px;left:0;right:0;text-align:center;color:#4d7a5b;font-size:9px;letter-spacing:2px;z-index:2;pointer-events:none}.game-bottom{display:flex;justify-content:space-between;margin:18px 2px 24px;font-size:11px;color:#8a9282}.controls{display:flex;align-items:center;gap:7px}.controls kbd{font-size:9px;padding:2px 5px;background:#f3f2e8}.controls span:nth-of-type(2){margin-left:10px}.tip{display:flex;align-items:center;gap:6px}.tip svg{width:13px;height:13px;color:#a99b62}
+    .below-game{display:grid;grid-template-columns:1.18fr 1fr;gap:19px}.card{border:1px solid #dfe3d6;background:#fffef8;border-radius:13px;padding:18px 21px}.card-heading{display:flex;align-items:center;gap:7px;font-weight:700;font-size:12px}.card-heading svg{width:14px;height:14px}.card-heading small{font-weight:400;font-size:10px;color:#9a9e8e;margin-left:auto;letter-spacing:.5px}.bird-list{display:flex;gap:9px;margin-top:15px}.bird-choice{flex:1;min-width:0;border:1px solid transparent;background:#f6f5ed;border-radius:8px;padding:9px 3px 7px;position:relative;transition:background .15s,border .15s}.bird-choice:hover{background:#f0f1e3}.bird-choice.selected{border:1px solid #d8b052;background:#fff6d7;box-shadow:0 2px 0 #e7cc83}.bird-choice svg{margin:0 auto 5px;height:28px;width:39px}.bird-choice span{font-size:10px;font-weight:500;color:#798474}.bird-choice.selected span{color:#806620}.bird-choice.selected:after{content:"✓";position:absolute;right:5px;top:3px;color:#aa8733;font-size:10px}.bird-choice:disabled:not(.selected){opacity:.45}.stats-row{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;margin-top:17px}.stat:not(:last-child){border-right:1px solid #e9eadf}.stat-value{font-size:28px;font-weight:800;letter-spacing:-1px;font-family:"Consolas",monospace;line-height:1.25}.stat-label{font-size:10px;color:#939889;margin-top:7px}.stat-value.gold{color:#bd933b}.stat-value.green{color:#658568}.personal-tag{font-size:9px;font-weight:500;border-radius:4px;background:#f0f3e8;color:#869a73;letter-spacing:0!important;padding:3px 6px;margin-left:auto}.page-footer{display:flex;justify-content:space-between;color:#9a9f8f;font-size:10px;letter-spacing:.7px;margin:25px 2px 24px}.footer-left{display:flex;gap:7px;align-items:center}.footer-left svg{height:12px;width:12px;color:#a0ad92}.footer-right{font-family:monospace;letter-spacing:1px;font-size:9px}
+    .scrim{background:#d3efe65c;backdrop-filter:blur(5px)}.result-panel{padding:23px 30px 21px;border:2px solid #42634d;background:#fffdf0f5;border-radius:14px;box-shadow:0 6px 0 #35514324;width:340px}.result-panel h2{font-size:22px;margin:6px 0 3px}.result-panel>p{margin:7px 0 13px;font-size:11px;letter-spacing:.4px}.result-eyebrow{color:#a59162;font-size:9px;letter-spacing:2px;font-weight:700}.result-stats{display:flex;justify-content:center;margin:12px 0 17px;gap:0}.result-stat{flex:1}.result-stat:not(:last-child){border-right:1px solid #e2e3d3}.result-stat strong{display:block;font-family:monospace;font-size:29px}.result-stat span{font-size:9px;color:#8a937e}.result-panel .primary-button{width:100%;font-size:13px;padding:9px 16px}.secondary-button{border:0;background:transparent;color:#87917f;font-size:10px;padding:12px 15px 0}.new-best{display:inline-block;background:#fff0b1;color:#987522;font-size:9px;padding:4px 10px;border-radius:20px;margin-top:8px}.pause-panel{background:#fffdf0eb;border:2px solid #42634d;box-shadow:0 5px 0 #35514325;border-radius:13px;padding:28px 40px}.pause-panel h2{margin-top:0}.pause-panel .primary-button{font-size:14px}.pause-panel .secondary-button{display:block;margin:5px auto 0}.medal{font-size:12px;color:#8a762d;margin:10px 0 0}.sound-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,15px);background:#2d493c;color:#fffbea;padding:10px 18px;border-radius:8px;font-size:12px;z-index:10;opacity:0;pointer-events:none;transition:.2s}.sound-toast.show{opacity:1;transform:translate(-50%,0)}
+    dialog{padding:29px 31px;border:2px solid #3d5a45;border-radius:16px;background:#fffdf2;color:var(--ink);width:min(420px,90vw);box-shadow:0 10px 0 #243b3b20}dialog::backdrop{background:#1a342b66;backdrop-filter:blur(4px)}.dialog-header{display:flex;justify-content:space-between;align-items:center}.dialog-header h2{font-size:21px;margin:0}.dialog-header .icon-button{background:#edeee2}.help-intro{color:#8d9584;font-size:12px;margin-bottom:23px}.help-step{display:flex;gap:13px;margin:18px 0;align-items:start}.step-number{width:27px;height:27px;flex:none;border-radius:7px;background:#f5eabf;color:#8b763d;display:grid;place-items:center;font-family:monospace;font-weight:800}.help-step h3{font-size:13px;margin:0 0 5px}.help-step p{font-size:12px;line-height:1.8;color:#818c78;margin:0}.help-footer{padding-top:18px;border-top:1px solid #e4e5d6;color:#8e977f;font-size:10px;line-height:1.8}dialog .primary-button{width:100%;margin-top:19px;font-size:13px;padding:10px}
+    @keyframes bob{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-7px) rotate(2deg)}}
+    @media(min-width:1500px){header{margin-top:8px}.hero{padding-top:43px;padding-bottom:32px}.game-frame{aspect-ratio:2.08/1}}
+    @media(max-width:700px){header{height:70px;margin:0 20px;padding:0}.brand{font-size:15px;gap:8px}.brand-icon{width:31px;height:31px}.header-right{gap:14px}.record-pill{padding:7px 10px;font-size:10px}.record-pill span{display:none}.text-button{font-size:11px}.hero{padding:27px 0 24px}.title-row h1{font-size:49px;letter-spacing:-2.5px}.title-row{gap:13px}.hero-bird{width:45px;height:38px}.hero p{font-size:11px;letter-spacing:.7px}.eyebrow{font-size:9px;letter-spacing:2px}.little-star{display:none}.game-label{font-size:9px;letter-spacing:.7px}.mode-button{padding:5px 10px;font-size:11px}.game-frame{aspect-ratio:1.25/1}.world-label{left:16px;top:19px;font-size:8px;letter-spacing:1px}.world-label svg{width:12px}.canvas-actions{top:14px;right:13px}.icon-button{width:30px;height:30px}.score-hud{top:18px}.live-score{font-size:39px}.overlay h2{font-size:24px}.overlay p{font-size:11px}.start-mascot{width:66px;height:54px}.primary-button{padding:11px 26px;font-size:15px}.ready-hint{font-size:8px;bottom:49px}.game-bottom{margin-bottom:20px}.tip{display:none}.below-game{grid-template-columns:1fr;gap:12px}.card{padding:16px 17px}.stats-card .stats-row{margin-top:14px;margin-bottom:3px}.page-footer{margin-top:20px;gap:10px;font-size:9px}.footer-right{font-size:8px}.result-panel{width:290px;padding:17px 23px}.result-panel h2{font-size:21px}.result-stats{margin:10px 0 14px}.result-stat strong{font-size:25px}.result-panel .keyboard-hint{margin-top:13px}.combo-toast{font-size:13px}.keyboard-hint{font-size:9px}.controls{font-size:10px}}
+    @media(max-width:440px){main{padding:0 16px}header{margin:0 16px}.game-frame{aspect-ratio:.87/1}.hero{padding:25px 0 22px}.title-row h1{font-size:43px}.hero-bird{width:39px}.title-row{gap:10px}.game-label{font-size:8px}.world-label{font-size:7px;gap:5px}.record-pill{gap:4px;padding:7px 9px}.record-pill svg{width:12px}.record-pill strong{font-size:12px}.header-right{gap:12px}.overlay{padding-top:54px}.overlay h2{font-size:23px}.overlay p{letter-spacing:.5px}.primary-button{font-size:14px}.start-mascot{width:75px;height:60px}.page-footer{letter-spacing:0}.footer-right{letter-spacing:0}.result-panel{width:268px}}
+    .hero-bird{flex-shrink:0}.hero-bird svg{width:100%;height:auto}.game-frame{width:100%;min-height:400px}.overlay.scrim{padding:12px}
+    @media(prefers-reduced-motion:reduce){.hero-bird,.start-mascot{animation:none}*{scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand"><div class="brand-icon" data-bird="sun" data-size="29"></div><span>BIRD<span>CLUB</span></span></div>
+    <div class="header-right">
+      <button class="text-button" id="helpButton"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9.7 8.5a2.4 2.4 0 0 1 4.7.7c0 1.7-2.4 2-2.4 3.8M12 16.5h.01"/></svg>怎麼玩</button>
+      <div class="record-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 3h8v6a4 4 0 0 1-8 0V3ZM8 5H4v3a4 4 0 0 0 4 4m8-7h4v3a4 4 0 0 1-4 4m-4 1v6m-4 2h8"/></svg><span>最佳紀錄</span><strong id="headerBest">00</strong></div>
+    </div>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="gameTitle">
+      <div class="eyebrow">A LITTLE FLAP. A BIG ADVENTURE.</div>
+      <span class="little-star" aria-hidden="true">✦</span><span class="little-star right" aria-hidden="true">✦</span>
+      <div class="title-row"><h1 id="gameTitle">FLAPPY <span>BIRD</span></h1><div class="hero-bird" data-bird="sun" data-size="61"></div></div>
+      <p>小小翅膀，大大冒險。你的下一次，會飛得更遠。</p>
+    </section>
+    <div class="game-toolbar">
+      <div class="game-label"><span class="live-dot"></span> ONE MORE TRY, ONE MORE SKY</div>
+      <div class="mode-switch" role="group" aria-label="遊戲難度"><button class="mode-button active" data-mode="classic" aria-pressed="true">經典模式</button><button class="mode-button" data-mode="challenge" aria-pressed="false">挑戰模式</button></div>
+    </div>
+    <section class="game-frame" id="gameFrame" aria-label="Flappy Bird 遊戲區域">
+      <canvas id="game" tabindex="0" aria-label="遊戲畫面：按空白鍵、向上鍵或點擊畫面拍動翅膀。P 暫停，M 切換音效。"></canvas>
+      <div class="hud">
+        <div class="world-label"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="4"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4.2 4.2l2 2m11.6 11.6 2 2m0-15.6-2 2M6.2 17.8l-2 2"/></svg><span id="worldLabel">01 / 晴空草原</span></div>
+        <div class="score-hud"><div class="score-caption">SCORE</div><div class="live-score" id="liveScore">0</div><div class="coin-hud"><i class="coin-icon" aria-hidden="true"></i><span id="liveCoins">0</span></div></div>
+        <div class="canvas-actions"><button class="icon-button" id="soundButton" aria-label="關閉音效" aria-pressed="true" title="音效（M）"></button><button class="icon-button" id="pauseButton" aria-label="暫停遊戲" title="暫停（P）" disabled><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></button></div>
+        <div class="combo-toast" id="comboToast" role="status"></div>
+      </div>
+      <div class="overlay" id="startOverlay">
+        <div class="overlay-panel">
+          <div class="start-mascot" id="startMascot" data-bird="sun" data-size="76"></div>
+          <h2>準備好，展翅高飛。</h2><p id="startDescription">穿越水管，收集金幣，讓紀錄再高一點！</p>
+          <button class="primary-button" id="startButton">開始飛行<svg viewBox="0 0 24 24" fill="currentColor"><path d="m8 4 12 8-12 8V4Z"/></svg></button>
+          <div class="keyboard-hint">按 <kbd>SPACE</kbd> 或點擊畫面開始</div>
+        </div>
+      </div>
+      <div class="ready-hint" id="readyHint">不必一次飛很遠，每次進步一點點就好。</div>
+      <div class="overlay scrim hidden" id="pauseOverlay"><div class="overlay-panel pause-panel"><h2>讓翅膀休息一下。</h2><p>你的冒險，就在這裡等你。</p><button class="primary-button" id="resumeButton">繼續飛行 <span aria-hidden="true">→</span></button><button class="secondary-button" id="pauseHomeButton">返回起點</button></div></div>
+      <div class="overlay scrim hidden" id="resultOverlay" aria-live="polite"><div class="overlay-panel result-panel"><div class="result-eyebrow">EVERY FLAP IS A FRESH START</div><h2 id="resultTitle">差一點！再飛一次？</h2><p id="resultMessage">好飛行員，都是從跌倒開始的。</p><div class="result-stats"><div class="result-stat"><strong id="resultScore">0</strong><span>本次分數</span></div><div class="result-stat"><strong id="resultBest">0</strong><span>最佳紀錄</span></div><div class="result-stat"><strong id="resultCoins">0</strong><span>獲得金幣</span></div></div><div class="new-best hidden" id="newBest">NEW BEST · 你創下新紀錄了！</div><p class="medal hidden" id="medal"></p><button class="primary-button" id="restartButton">再飛一次 <span aria-hidden="true">↻</span></button><button class="secondary-button" id="homeButton">返回起點</button><div class="keyboard-hint">按 <kbd>SPACE</kbd> 快速再來一場</div></div></div>
+    </section>
+    <div class="game-bottom"><div class="controls"><kbd>SPACE</kbd><span>/ 點擊 · 飛行</span><span><kbd>P</kbd> 暫停</span><span><kbd>M</kbd> 音效</span></div><div class="tip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18h6m-5 3h4M8 14a6 6 0 1 1 8 0c-1 1-1 2-1 2H9s0-1-1-2Z"/></svg>保持節奏，比飛得快更重要。</div></div>
+    <section class="below-game">
+      <div class="card"><div class="card-heading"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 16c3-1 3-5 6-6l1-6 4 3 4 1-2 4c0 5-6 8-13 7l3-3"/><path d="M14 10h.01"/></svg>選一位飛行夥伴 <small>每一隻，都有點不一樣。</small></div><div class="bird-list" role="group" aria-label="選擇飛行角色"><button class="bird-choice selected" data-skin="sun" aria-pressed="true" aria-label="選擇小太陽"><div data-bird="sun"></div><span>小太陽</span></button><button class="bird-choice" data-skin="mint" aria-pressed="false" aria-label="選擇薄荷糖"><div data-bird="mint"></div><span>薄荷糖</span></button><button class="bird-choice" data-skin="berry" aria-pressed="false" aria-label="選擇莓果派"><div data-bird="berry"></div><span>莓果派</span></button><button class="bird-choice" data-skin="night" aria-pressed="false" aria-label="選擇夜行俠"><div data-bird="night"></div><span>夜行俠</span></button></div></div>
+      <div class="card stats-card"><div class="card-heading"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V12h4v8m3 0V4h4v16m3 0V8h4v12"/></svg>你的飛行日誌<span class="personal-tag">儲存在此瀏覽器</span></div><div class="stats-row"><div class="stat"><div class="stat-value gold" id="statBest">00</div><div class="stat-label" id="bestLabel">經典最佳</div></div><div class="stat"><div class="stat-value green" id="statCoins">00</div><div class="stat-label">累積金幣</div></div><div class="stat"><div class="stat-value" id="statFlights">00</div><div class="stat-label">起飛次數</div></div></div></div>
+    </section>
+    <footer class="page-footer"><div class="footer-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m12 20-8-8a5 5 0 0 1 8-6 5 5 0 0 1 8 6l-8 8Z"/></svg>為每一個不放棄的小翅膀而做。</div><div class="footer-right">LESS SCROLLING. MORE FLAPPING.</div></footer>
+  </main>
+  <dialog id="helpDialog"><div class="dialog-header"><h2>飛行員入門指南</h2><button class="icon-button" id="closeHelp" aria-label="關閉說明">×</button></div><p class="help-intro">只要一個按鍵，就能展開一場冒險。</p><div class="help-step"><div class="step-number">01</div><div><h3>輕拍，飛起來</h3><p>按空白鍵、↑，或點一下遊戲畫面。每點一次就拍一下翅膀，不用長按。</p></div></div><div class="help-step"><div class="step-number">02</div><div><h3>找到水管之間的天空</h3><p>穿過一組水管得到 1 分。碰到水管或地面就結束，上緣也別飛過頭了！</p></div></div><div class="help-step"><div class="step-number">03</div><div><h3>金幣連擊，分數加倍精彩</h3><p>連續接住 3 枚金幣，額外獲得 2 分。10 / 25 / 50 分可獲得銅 / 銀 / 金牌。</p></div></div><div class="help-footer">經典模式：寬闊航道，輕鬆上手。<br>挑戰模式：速度更快，水管會上下移動。<br>按 P / Esc 暫停；按 M 切換音效。離開分頁時會自動暫停。</div><button class="primary-button" id="helpDone">知道了，去飛吧 <span aria-hidden="true">→</span></button></dialog>
+  <div class="sound-toast" id="toast" role="status"></div>
+  <script>
+    'use strict';
+    const $ = id => document.getElementById(id);
+    const skins = {
+      sun: { body: '#ffd254', light: '#ffed9b', wing: '#efa442', cheek: '#f29b60', trail: '#ffdb72' },
+      mint: { body: '#76c5ad', light: '#b9eed1', wing: '#45a397', cheek: '#eca58e', trail: '#8ae5c6' },
+      berry: { body: '#e798b1', light: '#ffd0d5', wing: '#c77096', cheek: '#ee7889', trail: '#f9a3c9' },
+      night: { body: '#9b9acb', light: '#d6cfed', wing: '#7676ad', cheek: '#c89eac', trail: '#c0b9f1' }
+    };
+    function birdSVG(skin, size = 40) {
+      const c = skins[skin];
+      return `<svg width="${size}" height="${size * .76}" viewBox="0 0 40 30" shape-rendering="crispEdges" aria-hidden="true"><path fill="#304b3b" d="M12 2h14v3h5v5h4v4h5v8h-9v4h-5v3H12v-3H6v-5H2v-9h4V7h6Z"/><path fill="${c.body}" d="M12 5h14v3h5v6h-5v10H12v-3H6v-9h6Z"/><path fill="${c.light}" d="M12 5h12v3H12Zm0 16h14v3H12Z"/><path fill="#fffdf0" d="M24 8h7v12h-9V10h2Z"/><path fill="#293f35" d="M28 11h3v6h-3Z"/><path fill="#ef9950" d="M29 17h8v3H27v-3Z"/><path fill="#bf6c42" d="M30 20h7v2h-7Z"/><path fill="${c.wing}" d="M4 14h10v3h4v5H8v-3H4Z"/><path fill="${c.light}" d="M4 14h10v3H4Z"/><path fill="${c.cheek}" d="M20 20h4v3h-4Z"/></svg>`;
+    }
+    document.querySelectorAll('[data-bird]').forEach(el => el.innerHTML = birdSVG(el.dataset.bird, Number(el.dataset.size) || 40));
+    const storageKey = 'birdclub-flight-log-v1';
+    const saved = { best: { classic: 0, challenge: 0 }, coins: 0, flights: 0, skin: 'sun', sound: true };
+    const validCount = value => Number.isSafeInteger(value) && value >= 0;
+    try {
+      const data = JSON.parse(localStorage.getItem(storageKey));
+      if (data && typeof data === 'object') {
+        for (const key of ['coins', 'flights']) if (validCount(data[key])) saved[key] = data[key];
+        for (const key of ['classic', 'challenge']) if (validCount(data.best?.[key])) saved.best[key] = data.best[key];
+        if (Object.hasOwn(skins, data.skin)) saved.skin = data.skin;
+        if (typeof data.sound === 'boolean') saved.sound = data.sound;
+      }
+    } catch {}
+    let storageAvailable = true;
+    function persist() {
+      try { localStorage.setItem(storageKey, JSON.stringify(saved)); }
+      catch { if (storageAvailable) { storageAvailable = false; toast('瀏覽器無法儲存紀錄；本次仍可正常遊玩。'); } }
+    }
+    let mode = 'classic', state = 'idle', score = 0, coins = 0, streak = 0, elapsed = 0;
+    let bird = { x: 240, y: 230, vy: 0, angle: 0 }, pipes = [], particles = [], floaters = [];
+    let W = 1000, H = 465, ground = 427, nextPipe = 0, animationTime = 0, previousTime = 0;
+    let shake = 0, flash = 0, deathAt = 0, comboTimer = 0, toastTimer, world = 0, helpPaused = false;
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const canvas = $('game'), ctx = canvas.getContext('2d'), frame = $('gameFrame');
+    const configs = { classic: { gravity: 930, flap: -322, speed: 174, gap: 163, interval: 1.73 }, challenge: { gravity: 1020, flap: -337, speed: 209, gap: 139, interval: 1.52 } };
+    const themes = [
+      { top: '#b6dedb', bottom: '#dfebc8', far: '#acccb1', hill: '#97bea0', ridge: '#84b692', label: '01 / 晴空草原' },
+      { top: '#d2c3cd', bottom: '#f8dbb7', far: '#c5b5a0', hill: '#abb69a', ridge: '#93a286', label: '02 / 日落山丘' },
+      { top: '#748ca9', bottom: '#b8c5bf', far: '#849da2', hill: '#718d94', ridge: '#5f8185', label: '03 / 星光森林' }
+    ];
+    function resize() {
+      const rect = frame.getBoundingClientRect();
+      const oldW = W, oldGround = ground;
+      H = 465; W = (rect.width - 6) / (rect.height - 6) * H; ground = H - 43;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round((rect.width - 6) * dpr); canvas.height = Math.round((rect.height - 6) * dpr);
+      ctx.setTransform(canvas.width / W, 0, 0, canvas.height / H, 0, 0);
+      if (state === 'playing') pause();
+      const newBirdX = W * .245;
+      for (const pipe of pipes) pipe.x += newBirdX - bird.x;
+      bird.x = newBirdX;
+      if (state === 'idle') bird.y = ground * .47;
+      else if (oldGround) bird.y *= ground / oldGround;
+    }
+    new ResizeObserver(resize).observe(frame);
+    function refreshStats() {
+      const best = saved.best[mode];
+      $('headerBest').textContent = String(best).padStart(2, '0');
+      $('statBest').textContent = String(best).padStart(2, '0');
+      $('statCoins').textContent = String(saved.coins).padStart(2, '0');
+      $('statFlights').textContent = String(saved.flights).padStart(2, '0');
+      $('bestLabel').textContent = mode === 'classic' ? '經典最佳' : '挑戰最佳';
+    }
+    function toast(message) {
+      clearTimeout(toastTimer); $('toast').textContent = message; $('toast').classList.add('show');
+      toastTimer = setTimeout(() => $('toast').classList.remove('show'), 2200);
+    }
+    let audio;
+    function audioReady() {
+      if (!saved.sound) return;
+      try { audio ||= new (window.AudioContext || window.webkitAudioContext)(); if (audio.state === 'suspended') audio.resume().catch(() => {}); } catch {}
+    }
+    function tone(freq, duration, type = 'sine', volume = .045, slide = 0, delay = 0) {
+      if (!saved.sound || !audio || audio.state !== 'running') return;
+      const oscillator = audio.createOscillator(), gain = audio.createGain(), t = audio.currentTime + delay;
+      oscillator.type = type; oscillator.frequency.setValueAtTime(freq, t);
+      if (slide) oscillator.frequency.exponentialRampToValueAtTime(slide, t + duration);
+      gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(volume, t + .01); gain.gain.exponentialRampToValueAtTime(.001, t + duration);
+      oscillator.connect(gain); gain.connect(audio.destination); oscillator.start(t); oscillator.stop(t + duration + .02);
+      oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+    }
+    function playSound(kind) {
+      if (kind === 'flap') tone(520, .10, 'sine', .035, 860);
+      if (kind === 'point') { tone(680, .10, 'triangle', .04); tone(1020, .15, 'triangle', .035, 0, .06); }
+      if (kind === 'coin') { tone(1100, .11, 'sine', .045); tone(1480, .16, 'sine', .035, 0, .055); }
+      if (kind === 'combo') [660, 830, 990, 1320].forEach((f, i) => tone(f, .19, 'triangle', .04, 0, i * .06));
+      if (kind === 'hit') { tone(180, .2, 'triangle', .075, 55); tone(85, .21, 'sine', .08, 35, .08); }
+      if (kind === 'start') [440, 550, 660].forEach((f, i) => tone(f, .13, 'triangle', .025, 0, i * .06));
+    }
+    function refreshSound() {
+      $('soundButton').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4 6 8H3v8h3l5 4V4Z"/>${saved.sound ? '<path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/>' : '<path d="m16 9 6 6m0-6-6 6"/>'}</svg>`;
+      $('soundButton').setAttribute('aria-label', saved.sound ? '關閉音效' : '開啟音效');
+      $('soundButton').setAttribute('aria-pressed', String(saved.sound));
+    }
+    function toggleSound() { saved.sound = !saved.sound; audioReady(); refreshSound(); persist(); toast(saved.sound ? '音效已開啟' : '音效已關閉'); }
+    function setSkin(skin) {
+      saved.skin = skin;
+      document.querySelectorAll('[data-skin]').forEach(button => { const active = button.dataset.skin === skin; button.classList.toggle('selected', active); button.setAttribute('aria-pressed', String(active)); });
+      $('startMascot').innerHTML = birdSVG(skin, 76);
+    }
+    function lockChoices(locked) {
+      document.querySelectorAll('[data-skin], [data-mode]').forEach(button => button.disabled = locked);
+      $('pauseButton').disabled = !locked;
+    }
+    function updateHUD() { $('liveScore').textContent = score; $('liveCoins').textContent = coins; }
+    function start() {
+      audioReady(); state = 'playing'; score = 0; coins = 0; streak = 0; elapsed = 0; world = 0;
+      bird = { x: W * .245, y: ground * .47, vy: configs[mode].flap, angle: -.35 };
+      pipes = []; particles = []; floaters = []; shake = 0; flash = 0; comboTimer = 0; nextPipe = 0;
+      spawnPipe(Math.max(W * .8, bird.x + 300));
+      nextPipe = configs[mode].interval;
+      saved.flights++; persist(); refreshStats(); updateHUD(); lockChoices(true);
+      $('worldLabel').textContent = themes[0].label;
+      ['startOverlay', 'pauseOverlay', 'resultOverlay', 'readyHint', 'comboToast'].forEach(id => $(id).classList.add('hidden'));
+      $('comboToast').classList.remove('show');
+      canvas.focus({ preventScroll: true }); playSound('start');
+    }
+    function flap() {
+      if ($('helpDialog').open) return;
+      if (state === 'idle') return start();
+      if (state === 'over' && performance.now() - deathAt > 550) return start();
+      if (state === 'paused') return;
+      if (state !== 'playing') return;
+      audioReady(); bird.vy = configs[mode].flap; playSound('flap');
+      for (let i = 0; i < 4; i++) particles.push({ x: bird.x - 13, y: bird.y + 6, vx: -40 - Math.random() * 80, vy: 20 + Math.random() * 35, life: .35, max: .35, color: skins[saved.skin].trail, size: 3 + Math.random() * 3 });
+    }
+    function pause() { if (state !== 'playing') return; state = 'paused'; $('pauseOverlay').classList.remove('hidden'); $('pauseButton').setAttribute('aria-label', '繼續遊戲'); }
+    function resume() { if (state !== 'paused' || $('helpDialog').open) return; state = 'playing'; $('pauseOverlay').classList.add('hidden'); $('pauseButton').setAttribute('aria-label', '暫停遊戲'); canvas.focus({ preventScroll: true }); audioReady(); }
+    function togglePause() { if (state === 'playing') pause(); else if (state === 'paused') resume(); }
+    function bankCoins() { saved.coins += coins; }
+    function home() {
+      if (state === 'playing' || state === 'paused') { bankCoins(); saved.best[mode] = Math.max(saved.best[mode], score); persist(); refreshStats(); }
+      state = 'idle'; pipes = []; particles = []; floaters = []; score = 0; coins = 0; world = 0; flash = 0; shake = 0;
+      bird.y = ground * .47; lockChoices(false); updateHUD();
+      ['pauseOverlay', 'resultOverlay'].forEach(id => $(id).classList.add('hidden'));
+      $('startOverlay').classList.remove('hidden'); $('readyHint').classList.remove('hidden'); $('comboToast').classList.remove('show'); $('worldLabel').textContent = themes[0].label;
+      $('pauseButton').setAttribute('aria-label', '暫停遊戲');
+    }
+    function gameOver() {
+      if (state !== 'playing') return;
+      state = 'over'; deathAt = performance.now(); shake = reducedMotion ? 0 : 7; flash = reducedMotion ? 0 : .32; playSound('hit');
+      burst(bird.x, bird.y, skins[saved.skin].trail, 19);
+      const newBest = score > saved.best[mode];
+      saved.best[mode] = Math.max(saved.best[mode], score); bankCoins(); persist(); refreshStats(); lockChoices(false);
+      $('resultScore').textContent = score; $('resultBest').textContent = saved.best[mode]; $('resultCoins').textContent = coins;
+      $('newBest').classList.toggle('hidden', !newBest);
+      $('resultTitle').textContent = newBest ? '比昨天的自己，更高。' : score >= 10 ? '這趟飛行，值得鼓掌。' : '差一點！再飛一次？';
+      $('resultMessage').textContent = newBest ? '每一次拍翅膀，都沒有白費。' : score === 0 ? '小訣竅：短短地點，穩穩地飛。' : '已經找到感覺了，再試一次吧。';
+      const medal = score >= 50 ? '金牌飛行員 · 天空沒有極限' : score >= 25 ? '銀牌飛行員 · 越飛越自在' : score >= 10 ? '銅牌飛行員 · 好的開始' : '';
+      $('medal').textContent = medal; $('medal').classList.toggle('hidden', !medal);
+      $('comboToast').classList.remove('show');
+      setTimeout(() => { if (state === 'over') $('resultOverlay').classList.remove('hidden'); }, 420);
+    }
+    function spawnPipe(x) {
+      const conf = configs[mode], gap = conf.gap - Math.min(score * .3, 14);
+      const margin = 65, low = margin + gap / 2, high = ground - margin - gap / 2;
+      let center = low + Math.random() * (high - low);
+      const previous = pipes.at(-1);
+      if (previous) center = Math.max(previous.base - 90, Math.min(previous.base + 90, center));
+      pipes.push({ x, center, base: center, gap, width: 65, passed: false, coin: true, coinChecked: false, phase: Math.random() * Math.PI * 2 });
+    }
+    function burst(x, y, color, count) {
+      for (let i = 0; i < count; i++) { const a = Math.random() * Math.PI * 2, speed = 40 + Math.random() * 160, life = .35 + Math.random() * .35; particles.push({ x, y, vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, life, max: life, color: i % 3 ? color : '#fff8cf', size: 3 + Math.random() * 4 }); }
+    }
+    function addScore(points, x, y) {
+      score += points; updateHUD(); floaters.push({ text: `+${points}`, x, y, life: 1, color: '#fffdef' });
+      const newWorld = Math.floor(score / 10) % themes.length;
+      if (newWorld !== world) { world = newWorld; $('worldLabel').textContent = themes[world].label; }
+    }
+    function update(dt) {
+      if (state === 'playing' || state === 'idle') animationTime += dt;
+      if (state === 'playing') {
+        elapsed += dt; const conf = configs[mode];
+        bird.vy += conf.gravity * dt; bird.y += bird.vy * dt;
+        const targetAngle = Math.max(-.45, Math.min(1.3, bird.vy / 460));
+        bird.angle += (targetAngle - bird.angle) * Math.min(1, dt * 11);
+        nextPipe -= dt;
+        const speed = conf.speed + Math.min(score * 1.1, 38);
+        if (nextPipe <= 0) { const last = pipes.at(-1); spawnPipe(Math.max(W + 50, last ? last.x + speed * conf.interval : W + 50)); nextPipe = conf.interval; }
+        for (const pipe of pipes) {
+          pipe.x -= speed * dt;
+          if (mode === 'challenge') pipe.center = pipe.base + Math.sin(elapsed * 1.8 + pipe.phase) * 24;
+          const top = pipe.center - pipe.gap / 2, bottom = pipe.center + pipe.gap / 2;
+          const radius = 11, left = pipe.x - 4, right = pipe.x + pipe.width + 4;
+          if (bird.x + radius > left && bird.x - radius < right && (bird.y - radius < top || bird.y + radius > bottom)) { gameOver(); break; }
+          const coinX = pipe.x + pipe.width / 2;
+          if (pipe.coin && Math.hypot(bird.x - coinX, bird.y - pipe.center) < 24) {
+            pipe.coin = false; coins++; streak++; burst(coinX, pipe.center, '#ffd568', 12); playSound('coin'); updateHUD();
+            if (streak % 3 === 0) { addScore(2, bird.x + 15, bird.y - 24); playSound('combo'); $('comboToast').textContent = `${streak} 枚連擊！額外 +2 分`; $('comboToast').classList.remove('hidden'); $('comboToast').classList.add('show'); comboTimer = 1.7; }
+          }
+          if (!pipe.coinChecked && coinX < bird.x - 25) { pipe.coinChecked = true; if (pipe.coin) streak = 0; }
+          if (!pipe.passed && pipe.x + pipe.width < bird.x - radius) { pipe.passed = true; addScore(1, bird.x + 25, bird.y - 18); playSound('point'); }
+        }
+        pipes = pipes.filter(pipe => pipe.x > -100);
+        if (state === 'playing' && (bird.y + 12 >= ground || bird.y - 12 <= 0)) gameOver();
+        if (comboTimer > 0) { comboTimer -= dt; if (comboTimer <= 0) $('comboToast').classList.remove('show'); }
+      }
+      if (state === 'over') { bird.vy += 1100 * dt; bird.y = Math.min(ground - 12, bird.y + bird.vy * dt); bird.angle = Math.min(1.5, bird.angle + dt * 4); }
+      if (state !== 'paused') {
+        for (const p of particles) { p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 160 * dt; p.life -= dt; }
+        particles = particles.filter(p => p.life > 0);
+        for (const p of floaters) { p.y -= 37 * dt; p.life -= dt; }
+        floaters = floaters.filter(p => p.life > 0);
+        shake = Math.max(0, shake - dt * 24); flash = Math.max(0, flash - dt * 1.6);
+      }
+    }
+    function block(x, y, w, h, color) { ctx.fillStyle = color; ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); }
+    function cloud(x, y, scale, alpha = .7) {
+      ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(scale, scale); ctx.globalAlpha = alpha;
+      const color = world === 2 ? '#e6e9da' : '#fffef0';
+      block(0, 14, 95, 18, color); block(12, 5, 65, 29, color); block(28, -5, 29, 39, color); block(78, 20, 27, 12, color); block(-9, 23, 17, 9, color);
+      ctx.restore();
+    }
+    function mountain(x, y, width, height, color) {
+      ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(x, y);
+      const steps = 12, half = width / 2;
+      for (let i = 0; i <= steps; i++) { const sx = x + i * half / steps, sy = y - Math.sin(i / steps * Math.PI / 2) * height; ctx.lineTo(sx, sy); ctx.lineTo(sx + half / steps, sy); }
+      for (let i = steps; i >= 0; i--) { const sx = x + width - i * half / steps, sy = y - Math.sin(i / steps * Math.PI / 2) * height; ctx.lineTo(sx, sy); ctx.lineTo(sx + half / steps, sy); }
+      ctx.lineTo(x + width + half / steps, y + 20); ctx.lineTo(x, y + 20); ctx.fill();
+    }
+    function background() {
+      const theme = themes[world];
+      const gradient = ctx.createLinearGradient(0, 0, 0, ground); gradient.addColorStop(0, theme.top); gradient.addColorStop(1, theme.bottom);
+      ctx.fillStyle = gradient; ctx.fillRect(0, 0, W, H);
+      if (world === 2) {
+        for (let i = 0; i < 28; i++) { const x = (i * 137 + 71) % W, y = 20 + (i * 79) % 225; ctx.globalAlpha = .4 + Math.sin(animationTime * 1.5 + i) * .25; block(x, y, 2, 2, '#fff9d5'); }
+        ctx.globalAlpha = 1; block(W * .8, 62, 29, 29, '#f4efd0'); block(W * .8 - 5, 67, 39, 19, '#f4efd0'); block(W * .8 + 9, 57, 21, 24, theme.top);
+      } else {
+        ctx.globalAlpha = .32; block(W * .77 - 8, 63, 54, 54, '#fff7bb'); block(W * .77, 55, 38, 70, '#fff7bb'); ctx.globalAlpha = .8; block(W * .77, 63, 38, 54, '#fff7d0'); block(W * .77 - 8, 71, 54, 38, '#fff7d0'); ctx.globalAlpha = 1;
+      }
+      const drift = animationTime * 8;
+      for (let i = 0; i < 6; i++) { const x = ((i * 229 + 85 - drift * (.5 + i % 2 * .3)) % (W + 200) + (W + 200)) % (W + 200) - 100; cloud(x, 83 + (i * 67) % 148, .45 + (i % 3) * .28, world === 2 ? .2 : .6); }
+      const backDrift = animationTime * 5;
+      for (let i = -1; i < Math.ceil(W / 140) + 2; i++) {
+        const x = i * 140 - backDrift % 140;
+        block(x, ground - 82, 28, 82, theme.far); block(x + 4, ground - 88, 20, 10, theme.far);
+        block(x + 35, ground - 106, 37, 106, theme.far); block(x + 45, ground - 115, 17, 12, theme.far);
+        block(x + 77, ground - 72, 48, 72, theme.far);
+        ctx.globalAlpha = .22;
+        for (let j = 0; j < 3; j++) { block(x + 42 + j * 9, ground - 91, 4, 6, '#eff5d2'); block(x + 42 + j * 9, ground - 76, 4, 6, '#eff5d2'); }
+        ctx.globalAlpha = 1;
+      }
+      for (let i = -1; i < Math.ceil(W / 250) + 2; i++) mountain(i * 250 - animationTime * 10 % 250, ground + 10, 310, 87 + i % 2 * 26, theme.hill);
+      for (let i = -1; i < Math.ceil(W / 175) + 2; i++) mountain(i * 175 - animationTime * 18 % 175, ground + 12, 220, 42 + (i % 3) * 9, theme.ridge);
+      const fleckDrift = animationTime * 18 % 43;
+      for (let i = 0; i < W / 43 + 2; i++) { block(i * 43 - fleckDrift, ground - 15 - (i % 3) * 4, 3, 4, '#c0d39f'); }
+    }
+    function drawPipe(pipe, decorative = false) {
+      const top = pipe.center - pipe.gap / 2, bottom = pipe.center + pipe.gap / 2, x = Math.round(pipe.x), width = pipe.width;
+      ctx.save(); if (decorative) ctx.globalAlpha = .65;
+      const outline = '#476b45', shadow = '#69a05c', main = '#91be70', light = '#bedb86';
+      function segment(y, h, capY) {
+        block(x, y, width, h, outline); block(x + 3, y, width - 6, h, main); block(x + 6, y, 7, h, light); block(x + width - 15, y, 11, h, shadow); block(x + width - 5, y, 2, h, '#567e4e');
+        block(x - 5, capY, width + 10, 23, outline); block(x - 2, capY + 3, width + 4, 17, main); block(x + 1, capY + 4, 8, 14, light); block(x + width - 13, capY + 3, 15, 17, shadow); block(x + 10, capY + 3, width - 22, 3, '#d0e397'); block(x - 2, capY + 18, width + 4, 2, '#709c52');
+        for (let iy = y + 45; iy < y + h - 8; iy += 52) { block(x + width - 19, iy, 4, 5, '#7aaf60'); block(x + width - 23, iy + 5, 4, 4, '#7aaf60'); }
+      }
+      segment(-25, top + 25, top - 23); segment(bottom, ground - bottom, bottom);
+      if (pipe.coin && !decorative) {
+        const coinX = x + width / 2, coinY = pipe.center + Math.sin(animationTime * 4 + pipe.phase) * 2;
+        const squeeze = .65 + Math.abs(Math.cos(animationTime * 3 + pipe.phase)) * .35;
+        ctx.save(); ctx.translate(coinX, coinY); ctx.scale(squeeze, 1);
+        block(-6, -10, 12, 20, '#bb8830'); block(-9, -7, 18, 14, '#bb8830'); block(-5, -8, 10, 16, '#ffcf51'); block(-7, -5, 14, 10, '#ffcf51'); block(-4, -6, 3, 11, '#ffed9c'); block(2, -5, 2, 10, '#dba93e');
+        ctx.restore();
+      }
+      ctx.restore();
+    }
+    function drawGround() {
+      block(0, ground, W, H - ground, '#dce3b1'); block(0, ground, W, 3, '#426d43'); block(0, ground + 3, W, 8, '#94bc63'); block(0, ground + 11, W, 3, '#658d48'); block(0, ground + 14, W, 4, '#eee9b7'); block(0, ground + 18, W, 2, '#c7ca94');
+      const offset = animationTime * (state === 'idle' ? 35 : configs[mode].speed) % 24;
+      for (let i = -1; i < W / 24 + 1; i++) { const x = i * 24 - offset; block(x, ground + 3, 9, 4, '#c5df88'); block(x + 8, ground + 7, 9, 4, '#c5df88'); block(x + 8, ground + 28, 3, 3, '#c3cb99'); block(x + 18, ground + 36, 5, 2, '#ced2a0'); }
+    }
+    function drawBird() {
+      const c = skins[saved.skin], flapFrame = Math.sin(animationTime * 23) > 0;
+      ctx.save(); ctx.translate(Math.round(bird.x), Math.round(bird.y)); ctx.rotate(bird.angle); ctx.scale(.98, .98);
+      const wingY = bird.vy < 0 && flapFrame ? -1 : 6;
+      block(-10, -13, 21, 3, '#304b3b'); block(-15, -10, 29, 3, '#304b3b'); block(-18, -7, 34, 19, '#304b3b'); block(-13, 12, 27, 3, '#304b3b'); block(-9, 15, 19, 2, '#304b3b');
+      block(-10, -10, 21, 23, c.body); block(-15, -6, 28, 15, c.body); block(-8, -9, 17, 4, c.light); block(-7, 9, 17, 4, c.light);
+      block(4, -8, 13, 16, '#304b3b'); block(6, -9, 9, 17, '#fffef0'); block(4, -5, 12, 11, '#fffef0'); block(12, -5, 4, 8, '#293d32'); block(12, -5, 2, 2, '#fff');
+      block(11, 4, 17, 8, '#304b3b'); block(13, 5, 14, 3, '#ef9950'); block(12, 9, 13, 2, '#dc7843');
+      block(-20, wingY - 3, 16, 11, '#304b3b'); block(-16, wingY + 8, 15, 3, '#304b3b'); block(-18, wingY, 14, 7, c.wing); block(-14, wingY + 5, 11, 3, c.wing); block(-17, wingY - 1, 11, 3, c.light); block(3, 8, 5, 3, c.cheek);
+      ctx.restore();
+    }
+    function render() {
+      ctx.save(); if (shake > 0) ctx.translate((Math.random() - .5) * shake, (Math.random() - .5) * shake);
+      background();
+      if (state === 'idle') {
+        drawPipe({ x: W > 650 ? 86 : -30, center: ground * .49, gap: 206, width: W > 650 ? 68 : 54 }, true);
+        drawPipe({ x: W - (W > 650 ? 146 : 20), center: ground * .61, gap: 197, width: W > 650 ? 68 : 54 }, true);
+      } else { for (const pipe of pipes) drawPipe(pipe); drawBird(); }
+      for (const p of particles) { ctx.globalAlpha = Math.max(0, p.life / p.max); block(p.x, p.y, p.size, p.size, p.color); }
+      ctx.globalAlpha = 1;
+      for (const p of floaters) { ctx.globalAlpha = Math.min(1, p.life * 2); ctx.font = 'bold 20px monospace'; ctx.textAlign = 'center'; ctx.lineWidth = 3; ctx.strokeStyle = '#48764b'; ctx.strokeText(p.text, p.x, p.y); ctx.fillStyle = p.color; ctx.fillText(p.text, p.x, p.y); }
+      ctx.globalAlpha = 1; drawGround();
+      if (flash > 0) { ctx.fillStyle = `rgba(255,252,230,${flash})`; ctx.fillRect(0, 0, W, H); }
+      ctx.restore();
+    }
+    function loop(time) {
+      const dt = Math.min((time - previousTime) / 1000 || 0, .033); previousTime = time;
+      let remaining = dt;
+      while (remaining > 0) { const step = Math.min(remaining, 1 / 120); update(step); remaining -= step; }
+      render(); requestAnimationFrame(loop);
+    }
+    $('startButton').addEventListener('click', start);
+    $('restartButton').addEventListener('click', start);
+    $('homeButton').addEventListener('click', home);
+    $('pauseHomeButton').addEventListener('click', home);
+    $('pauseButton').addEventListener('click', togglePause);
+    $('resumeButton').addEventListener('click', resume);
+    $('soundButton').addEventListener('click', toggleSound);
+    canvas.addEventListener('pointerdown', event => { event.preventDefault(); canvas.focus({ preventScroll: true }); flap(); });
+    document.addEventListener('keydown', event => {
+      if ($('helpDialog').open || event.ctrlKey || event.metaKey || event.altKey) return;
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName)) return;
+      if (event.code === 'Space' || event.code === 'ArrowUp') {
+        if (event.target.closest('button') && (state === 'idle' || state === 'over' || state === 'paused')) return;
+        event.preventDefault(); if (!event.repeat) flap();
+      }
+      if (['KeyP', 'Escape'].includes(event.code) && !event.repeat) { event.preventDefault(); togglePause(); }
+      if (event.code === 'KeyM' && !event.repeat) { event.preventDefault(); toggleSound(); }
+    });
+    document.querySelectorAll('[data-mode]').forEach(button => button.addEventListener('click', () => {
+      if (state === 'playing' || state === 'paused') return;
+      mode = button.dataset.mode;
+      document.querySelectorAll('[data-mode]').forEach(b => { const active = b.dataset.mode === mode; b.classList.toggle('active', active); b.setAttribute('aria-pressed', String(active)); });
+      $('startDescription').textContent = mode === 'classic' ? '穿越水管，收集金幣，讓紀錄再高一點！' : '更快的飛行、移動的水管。準備接受挑戰？';
+      refreshStats(); if (state === 'over') home();
+    }));
+    document.querySelectorAll('[data-skin]').forEach(button => button.addEventListener('click', () => { if (state === 'playing' || state === 'paused') return; setSkin(button.dataset.skin); persist(); }));
+    $('helpButton').addEventListener('click', () => { helpPaused = state === 'playing'; if (helpPaused) pause(); $('helpDialog').showModal(); });
+    function closeHelp() { $('helpDialog').close(); }
+    $('closeHelp').addEventListener('click', closeHelp); $('helpDone').addEventListener('click', closeHelp);
+    $('helpDialog').addEventListener('close', () => { if (helpPaused) { helpPaused = false; canvas.focus({ preventScroll: true }); } });
+    $('helpDialog').addEventListener('click', event => { const r = $('helpDialog').getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) closeHelp(); });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+    window.addEventListener('blur', () => { if (!$('helpDialog').open) pause(); });
+    setSkin(saved.skin); refreshStats(); refreshSound(); resize(); requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
